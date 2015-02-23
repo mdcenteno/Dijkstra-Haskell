@@ -25,7 +25,7 @@ peso aresta = terceiro(aresta)
 
 iNF = 1000000 -- Infinito, inatingível.
 
--- chamada do programa com entrada bonita para o usuário
+-- chamada do programa com entrada adequada para o usuário
 dijkstra :: Int -> Int -> [(Int,Int,Int)] -> Int
 dijkstra partida chegada grafo = dijkstraCore [(partida,0,False)] chegada grafo
 
@@ -37,7 +37,7 @@ dijkstraCore visitar@(v:vs) chegada grafo
 	| visitado v /= False = iNF -- Inatingível
     | otherwise = varreArestas visitar grafo chegada grafo
 
--- percorre a (Int,Int,Int)s com origem no (Int, Int, Bool) a se verificar e alimenta a fila de (Int, Int, Bool)s a visitar.
+-- percorre a arestas com origem no vertice a se verificar e alimenta a fila de arestas a visitar.
 varreArestas :: [(Int, Int, Bool)] -> [(Int,Int,Int)] -> Int -> [(Int,Int,Int)] -> Int
 varreArestas visitar [] chegada grafo = 
 	    dijkstraCore (posicionarMenorNaFrente(atualizarVisitadoPrimeiro(visitar))) chegada grafo
