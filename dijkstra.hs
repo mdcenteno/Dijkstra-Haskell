@@ -39,9 +39,11 @@ dijkstraCore visitar@(v:vs) chegada grafo
 
 -- percorre a (Int,Int,Int)s com origem no (Int, Int, Bool) a se verificar e alimenta a fila de (Int, Int, Bool)s a visitar.
 varreArestas :: [(Int, Int, Bool)] -> [(Int,Int,Int)] -> Int -> [(Int,Int,Int)] -> Int
-varreArestas visitar [] chegada grafo = dijkstraCore (posicionarMenorNaFrente(atualizarVisitadoPrimeiro(visitar))) chegada grafo
+varreArestas visitar [] chegada grafo = 
+	    dijkstraCore (posicionarMenorNaFrente(atualizarVisitadoPrimeiro(visitar))) chegada grafo
 varreArestas visitar@(v:vs) arestas@(ar:ars) chegada grafo
-    | v_id v == origem ar && estaEm (destino ar) visitar == False = varreArestas (visitar ++ [(destino ar, v_peso v + peso ar, False)]) ars chegada grafo  
+    | v_id v == origem ar && estaEm (destino ar) visitar == False = 
+    	    varreArestas (visitar ++ [(destino ar, v_peso v + peso ar, False)]) ars chegada grafo  
     | v_id v == origem ar && estaEmNaoVisitados (destino ar) visitar && v_peso v + peso ar < verificaPeso (destino ar) visitar =
 	    varreArestas (atualizarPeso (destino ar, v_peso v + peso ar, visitado v) visitar) ars chegada grafo
     | otherwise = varreArestas visitar ars chegada grafo
