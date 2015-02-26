@@ -1,4 +1,3 @@
-
 primeiro :: (a, b, c) -> a
 primeiro (x, _, _) = x
 segundo :: (a, b, c) -> b
@@ -26,6 +25,10 @@ peso aresta = terceiro(aresta)
 iNF = 1000000 -- Infinito, inatingível.
 
 -- chamada do programa com entrada adequada para o usuário
+-- Casos de teste:
+-- dijkstra 1 4 [(1,2,1),(1,3,1),(2,3,1),(2,4,1),(3,4,1)] : 2
+-- dijkstra 1 4 [(1,2,5),(1,3,1),(2,3,1),(2,4,5),(3,4,1)] : 2
+-- dijkstra 1 4 [(1,2,1),(1,3,5),(2,3,1),(2,4,5),(3,4,1)] : 3
 dijkstra :: Int -> Int -> [(Int,Int,Int)] -> Int
 dijkstra partida chegada grafo = dijkstraCore [(partida,0,False)] chegada grafo
 
@@ -39,86 +42,44 @@ dijkstraCore visitar@(v:vs) chegada grafo
 
 -- percorre a arestas com origem no vertice a se verificar e alimenta a fila de arestas a visitar.
 varreArestas :: [(Int, Int, Bool)] -> [(Int,Int,Int)] -> Int -> [(Int,Int,Int)] -> Int
-varreArestas visitar [] chegada grafo = 
-        dijkstraCore (posicionarMenorNaFrente(atualizarVisitadoPrimeiro(visitar))) chegada grafo
+varreArestas visitar@(v:vs) [] chegada grafo = 
+        dijkstraCore (posicionarMenorNaoVisitadoNaFrente((v_id v,v_peso v,True):vs)) chegada grafo
 varreArestas visitar@(v:vs) arestas@(ar:ars) chegada grafo
-    | v_id v == origem ar && estaEm (destino ar) visitar == False = 
-        varreArestas (visitar ++ [(destino ar, v_peso v + peso ar, False)]) ars chegada grafo  
-    | v_id v == origem ar && estaEmNaoVisitados (destino ar) visitar && v_peso v + peso ar < verificaPeso (destino ar) visitar =
-        varreArestas (atualizarPeso (destino ar, v_peso v + peso ar, visitado v) visitar) ars chegada grafo
+	| v_id v == origem ar 
+	  && not (or (map (\ y -> (destino ar) == v_id y) visitar))
+	    = varreArestas (visitar ++ [(destino ar, v_peso v + peso ar, False)]) ars chegada grafo  
+    | v_id v == origem ar 
+	  && or (map (\ y -> (destino ar) == v_id y && visitado y /= True) visitar)
+	  && v_peso v + peso ar < verificaPeso (destino ar) visitar 	
+		= varreArestas (atualizarPeso (destino ar, v_peso v + peso ar, visitado v) visitar) ars chegada grafo
     | otherwise = varreArestas visitar ars chegada grafo
 
--- dijkstra 1 2 [(1,2,8),(1,3,1),(3,2,1)]
--- 2,2,false;1,0,t;3,1,t;
 atualizarPeso :: (Int, Int, Bool) -> [(Int, Int, Bool)] -> [(Int, Int, Bool)]
 atualizarPeso novovalor lista = atualizarPesoCore [] novovalor lista
 atualizarPesoCore :: [(Int, Int, Bool)] -> (Int, Int, Bool) -> [(Int, Int, Bool)] -> [(Int, Int, Bool)]
 atualizarPesoCore verificados novovalor porverificar@(p:ps)
     | v_id(novovalor) == v_id p = verificados ++ [novovalor] ++ ps
     | otherwise = atualizarPesoCore (verificados ++ [p]) novovalor ps
-	
-atualizarVisitadoPrimeiro :: [(Int, Int, Bool)] -> [(Int, Int, Bool)]
-atualizarVisitadoPrimeiro lista@(l:ls) = (v_id l,v_peso l,True):ls
 
--- verificaPeso 2 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- 5
--- verificaPeso 3 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- 3
--- verificaPeso 4 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- 1000000
--- verificaPeso 5 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- 1000000
+-- verificaPeso 2 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)] : 5
+-- verificaPeso 4 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)] : 1000000
 verificaPeso :: Int -> [(Int, Int, Bool)] -> Int
 verificaPeso procurado lista@(l:ls)
     | lista == [] = iNF
-    | procurado == v_id l && visitado l /= True = v_peso l
-    | otherwise = verificaPeso procurado ls
+	| procurado == v_id l && visitado l /= True = v_peso l
+	| otherwise = verificaPeso procurado ls
 	
--- posicionarMenorNaFrente [(1,1,True),(1,5,False),(1,3,False),(1,2,False),(1,4,False),(1,9,True)]
--- [(1,2,False),(1,9,True),(1,4,False),(1,3,False),(1,5,False),(1,1,True)]
--- posicionarMenorNaFrente [(1,1,True),(1,5,True),(1,3,True),(1,2,True),(1,4,True),(1,9,True)]
--- [(1,1,True),(1,9,True),(1,4,True),(1,2,True),(1,3,True),(1,5,True)]
--- posicionarMenorNaFrente [(1,1,True),(1,5,True),(1,3,True),(1,2,True),(1,4,True),(1,9,False)]
--- [(1,9,False),(1,1,True),(1,4,True),(1,2,True),(1,3,True),(1,5,True)]
--- posicionarMenorNaFrente [(1,1,False),(1,5,True),(1,3,True),(1,2,True),(1,4,True),(1,9,True)]
--- [(1,1,False),(1,9,True),(1,4,True),(1,2,True),(1,3,True),(1,5,True)]
--- posicionarMenorNaFrente [(1,8,False),(1,5,True),(1,3,True),(1,2,False),(1,4,True),(1,9,True)]
--- [(1,2,False),(1,9,True),(1,4,True),(1,8,False),(1,3,True),(1,5,True)]
-posicionarMenorNaFrente :: [(Int, Int, Bool)] -> [(Int, Int, Bool)]
-posicionarMenorNaFrente lista = posicionarMenorNaFrenteCore [] (head(lista)) (tail(lista))
-posicionarMenorNaFrenteCore :: [(Int, Int, Bool)] -> (Int, Int, Bool) -> [(Int, Int, Bool)] -> [(Int, Int, Bool)]
-posicionarMenorNaFrenteCore verificados candidato [] = candidato:verificados
-posicionarMenorNaFrenteCore verificados candidato porverificar@(p:ps)    
-    | visitado p == True = 
-        posicionarMenorNaFrenteCore (p:verificados) candidato ps
-    | visitado(candidato) == True = 
-        posicionarMenorNaFrenteCore (candidato:verificados) p ps
-    | visitado p == False && v_peso(candidato) < v_peso p = 
-        posicionarMenorNaFrenteCore (p:verificados) candidato ps
-    | otherwise = 
-        posicionarMenorNaFrenteCore (candidato:verificados) p ps
-
-estaEm :: Int -> [(Int, Int, Bool)] -> Bool
-estaEm _ [] = False
-estaEm procurado lista@(l:ls) 
-    | procurado == v_id l = True
-    | otherwise = estaEm(procurado) ls
-	
--- estaEmNaoVisitados 3 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- True
--- estaEmNaoVisitados 4 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- False
--- estaEmNaoVisitados 5 [(1,2,False),(2,5,False),(3,3,False),(4,1,True)]
--- False
-estaEmNaoVisitados :: Int -> [(Int, Int, Bool)] -> Bool
-estaEmNaoVisitados _ [] = False
-estaEmNaoVisitados procurado lista@(l:ls)
-    | procurado == v_id l && visitado l /= True = True
-    | otherwise = estaEmNaoVisitados procurado ls 
-
-atualizarVisitado :: (Int, Int, Bool) -> [(Int, Int, Bool)] -> [(Int, Int, Bool)]
-atualizarVisitado novovalor lista = atualizarVisitadoCore [] novovalor lista
-atualizarVisitadoCore :: [(Int, Int, Bool)] -> (Int, Int, Bool) -> [(Int, Int, Bool)] -> [(Int, Int, Bool)]
-atualizarVisitadoCore verificados@(v:vs) novovalor porverificar@(p:ps)
-    | v_id(novovalor) == v_id p = verificados ++ [(v_id novovalor, v_peso novovalor, True)] ++ ps
-    | otherwise = atualizarVisitadoCore (p:verificados) novovalor ps
+-- posicionarMenorNaoVisitadoNaFrente [(1,1,True),(1,5,False),(1,3,False),(1,2,False),(1,4,False),(1,9,True)]
+-- : [(1,2,False),(1,9,True),(1,4,False),(1,3,False),(1,5,False),(1,1,True)]
+posicionarMenorNaoVisitadoNaFrente :: [(Int, Int, Bool)] -> [(Int, Int, Bool)]
+posicionarMenorNaoVisitadoNaFrente lista = posicionarMenorNaoVisitadoNaFrenteCore [] (head(lista)) (tail(lista))
+posicionarMenorNaoVisitadoNaFrenteCore :: [(Int, Int, Bool)] -> (Int, Int, Bool) -> [(Int, Int, Bool)] -> [(Int, Int, Bool)]
+posicionarMenorNaoVisitadoNaFrenteCore verificados candidato [] = candidato:verificados
+posicionarMenorNaoVisitadoNaFrenteCore verificados candidato porverificar@(p:ps)    
+    | visitado p == True 
+	    = posicionarMenorNaoVisitadoNaFrenteCore (p:verificados) candidato ps
+    | visitado(candidato) == True 
+        = posicionarMenorNaoVisitadoNaFrenteCore (candidato:verificados) p ps
+    | visitado p == False && v_peso(candidato) < v_peso p 
+        = posicionarMenorNaoVisitadoNaFrenteCore (p:verificados) candidato ps
+    | otherwise = posicionarMenorNaoVisitadoNaFrenteCore (candidato:verificados) p ps
