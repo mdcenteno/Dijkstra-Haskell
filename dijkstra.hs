@@ -45,7 +45,7 @@ varreArestas :: [(Int, Int, Bool)] -> [(Int,Int,Int)] -> Int -> [(Int,Int,Int)] 
 varreArestas visitar@(v:vs) [] chegada grafo = 
         dijkstraCore (posicionarMenorNaoVisitadoNaFrente((v_id v,v_peso v,True):vs)) chegada grafo
 varreArestas visitar@(v:vs) arestas@(ar:ars) chegada grafo
-	| v_id v == origem ar 
+    | v_id v == origem ar 
 	  && not (or (map (\ y -> (destino ar) == v_id y) visitar))
 	    = varreArestas (visitar ++ [(destino ar, v_peso v + peso ar, False)]) ars chegada grafo  
     | v_id v == origem ar 
@@ -66,8 +66,8 @@ atualizarPesoCore verificados novovalor porverificar@(p:ps)
 verificaPeso :: Int -> [(Int, Int, Bool)] -> Int
 verificaPeso procurado lista@(l:ls)
     | lista == [] = iNF
-	| procurado == v_id l && visitado l /= True = v_peso l
-	| otherwise = verificaPeso procurado ls
+    | procurado == v_id l && visitado l /= True = v_peso l
+    | otherwise = verificaPeso procurado ls
 	
 -- posicionarMenorNaoVisitadoNaFrente [(1,1,True),(1,5,False),(1,3,False),(1,2,False),(1,4,False),(1,9,True)]
 -- : [(1,2,False),(1,9,True),(1,4,False),(1,3,False),(1,5,False),(1,1,True)]
