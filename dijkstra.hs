@@ -1,29 +1,3 @@
-primeiro :: (a, b, c) -> a
-primeiro (x, _, _) = x
-segundo :: (a, b, c) -> b
-segundo (_, y, _) = y
-terceiro :: (a, b, c) -> c
-terceiro (_, _, z) = z
-
--- Vertice
-v_id :: (Int, Int, Bool) -> Int
-v_id vertice = primeiro(vertice)
-v_peso :: (Int, Int, Bool) -> Int
-v_peso vertice = segundo(vertice)
-visitado  :: (Int, Int, Bool) -> Bool
-visitado vertice = terceiro(vertice)
-
--- Aresta
-origem :: (Int,Int,Int) -> Int
-origem aresta = primeiro(aresta)
-destino :: (Int,Int,Int) -> Int
-destino aresta = segundo(aresta)
-peso :: (Int,Int,Int) -> Int
-peso aresta = terceiro(aresta)
-
-
-iNF = 1000000 -- Infinito, inatingível.
-
 -- chamada do programa com entrada adequada para o usuário
 -- Casos de teste:
 -- dijkstra 1 4 [(1,2,1),(1,3,1),(2,3,1),(2,4,1),(3,4,1)] : 2
@@ -83,3 +57,28 @@ posicionarMenorNaoVisitadoNaFrenteCore verificados candidato porverificar@(p:ps)
     | visitado p == False && v_peso(candidato) < v_peso p 
         = posicionarMenorNaoVisitadoNaFrenteCore (p:verificados) candidato ps
     | otherwise = posicionarMenorNaoVisitadoNaFrenteCore (candidato:verificados) p ps
+
+primeiro :: (a, b, c) -> a
+primeiro (x, _, _) = x
+segundo :: (a, b, c) -> b
+segundo (_, y, _) = y
+terceiro :: (a, b, c) -> c
+terceiro (_, _, z) = z
+
+-- Vertice
+v_id :: (Int, Int, Bool) -> Int
+v_id vertice = primeiro(vertice)
+v_peso :: (Int, Int, Bool) -> Int
+v_peso vertice = segundo(vertice)
+visitado  :: (Int, Int, Bool) -> Bool
+visitado vertice = terceiro(vertice)
+
+-- Aresta
+origem :: (Int,Int,Int) -> Int
+origem aresta = primeiro(aresta)
+destino :: (Int,Int,Int) -> Int
+destino aresta = segundo(aresta)
+peso :: (Int,Int,Int) -> Int
+peso aresta = terceiro(aresta)
+
+iNF = 1000000 -- Infinito, inatingível.
